@@ -1,6 +1,17 @@
 use chrono::{DateTime, Days, prelude::*};
 use eframe::{App, egui};
 use serde::{Deserialize, Serialize};
+use std::fs::{self, File};
+use std::io::{self, Write};
+use std::path::Path;
+
+pub trait SaveToFile: Serialize {
+    fn to_file(&self, path: &Path) {
+        let json = serde_json::to_string(&self).unwrap();
+        let mut file = File::create(path).unwrap();
+        file.write_all(json.as_bytes()).unwrap();
+    }
+}
 
 struct ProjectLijst {
     projecten: Vec<Project>,
@@ -30,6 +41,8 @@ struct Taak {
     beschrijving: String,
     moeilijkheid: u8,
     status: TaakStatus,
+}
+impl SaveToFile for Taak{
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -68,6 +81,17 @@ impl eframe::App for AppTest {
 }
 
 fn main() -> eframe::Result {
+    let huidige_tijd = chrono::Utc::now();
+    let binnen_dag = huidige_tijd.checked_add_days(Days::new(1)).unwrap();
+    let test_taak = Taak {
+        start: huidige_tijd,
+        deadline: binnen_dag,
+        beschrijving: String::from("saus taakje"),
+        moeilijkheid: 5,
+        status: TaakStatus::Begonnen,
+    };
+    test_taak.to_file(Path::new("test.json"));
+
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default().with_inner_size([320.0, 240.0]),
         ..Default::default()
@@ -87,4 +111,3 @@ impl eframe::App for ProjectLijst {
         });
     }
 }
-
