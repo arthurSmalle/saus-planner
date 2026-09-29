@@ -13,6 +13,7 @@ struct Project{
 struct Taak{
     start: DateTime<Utc>,
     deadline: DateTime<Utc>,
+    beschrijving: String,
     moeilijkheid: u8,
     status: TaakStatus,
 }
@@ -26,6 +27,7 @@ fn main() {
     let taak_ib3 = Taak {
         start: huidige_tijd,
         deadline: binnen_dag,
+        beschrijving: String::from("saus taakje"),
         moeilijkheid: 5,
         status: TaakStatus::Begonnen,
     };
@@ -40,11 +42,14 @@ fn main() {
     print!("{:?}", project);
     project.add_task(taak_ib3).unwrap();
     print!("{:?}", project);
+    let serialized = serde_json::to_string(&project).unwrap();
+    print!("\n==================\n{serialized}");
 }
 
 impl Project {
     fn add_task (&mut self, taak: Taak) -> Result<(),&'static str>{
         if self.deadline.timestamp() - taak.deadline.timestamp() >= 0 {
+            self.taken.push(taak);
             Ok(())
         } else {
             Err("De deadline van deze taak komt na de deadline van het project")
