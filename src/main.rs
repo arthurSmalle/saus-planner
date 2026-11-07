@@ -27,12 +27,8 @@ impl Project {
 fn main() {
     let huidige_tijd = chrono::Utc::now();
     let binnen_dag = huidige_tijd.checked_add_days(Days::new(1)).unwrap();
-    let test_taak = Taak::new( huidige_tijd, binnen_dag, String::from("saus taak"), 5, 5);
-    let test_taak_lokatie :&str = "taak_test.json";
+    let test_taak = Taak::new(huidige_tijd, binnen_dag, String::from("saus taak"), 5, 5);
+    let test_taak_lokatie: &str = "taak_test.json";
     test_taak.to_file(Path::new(&test_taak_lokatie));
-
-    let file = File::open(&test_taak_lokatie).unwrap();
-    let reader = BufReader::new(file);
-    let deserialized_json: Taak = serde_json::from_reader(reader).unwrap();
-    println!("{:?}",deserialized_json)
+    println!("{:?}", Taak::get_taken("."));
 }
