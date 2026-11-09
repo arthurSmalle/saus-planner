@@ -2,9 +2,11 @@ use chrono::{DateTime, TimeDelta, prelude::*};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::{fs::File, io::BufReader, path::Path};
+use super::sausid::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Taak {
+        id: i64,
     pub start: DateTime<Utc>,
     pub deadline: DateTime<Utc>,
     pub beschrijving: String,
@@ -22,6 +24,7 @@ pub trait SaveToFile: Serialize {
 
 impl Taak {
     pub fn new(
+        id_gen: &mut SausidGen,
         start: DateTime<Utc>,
         deadline: DateTime<Utc>,
         beschrijving: String,
@@ -29,6 +32,7 @@ impl Taak {
         tijdschatting: u8,
     ) -> Self {
         Taak {
+            id: id_gen.get_saudid(),
             start,
             deadline,
             beschrijving,
@@ -56,5 +60,8 @@ impl Taak {
             }
         }
         taken
+    }
+    pub fn get_id(&self) -> i64 {
+        self.id
     }
 }

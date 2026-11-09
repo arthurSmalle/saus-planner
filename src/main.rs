@@ -1,6 +1,6 @@
-use SausPlanner::sausid::get_id;
 use SausPlanner::taak::*;
-use SausPlanner::sausid;
+use SausPlanner::sausid::SausidGen;
+use std::fmt::{self, format};
 
 use chrono::{DateTime, Days, TimeDelta, prelude::*};
 use serde::{Deserialize, Serialize};
@@ -28,15 +28,11 @@ impl Project {
 }
 
 fn main() {
+    let mut id_gen = SausidGen::new();
     let huidige_tijd = chrono::Utc::now();
     let binnen_dag = huidige_tijd.checked_add_days(Days::new(1)).unwrap();
-    let test_taak = Taak::new(huidige_tijd, binnen_dag, String::from("saus taak"), 5, 5);
-    let test_taak_lokatie: &str = "taak_test.json";
+    let test_taak = Taak::new(&mut id_gen,huidige_tijd, binnen_dag, String::from("saus taak"), 5, 5);
+    let test_taak_lokatie: &str = &(format!("taak_{}.json", test_taak.get_id()));
     test_taak.to_file(Path::new(&test_taak_lokatie));
-
-    let saus1 = get_id();
-    let saus2 = get_id();
-    println!("saus id1: {}",saus1);
-    println!("saus id2: {}",saus2);
     println!("{:?}", Taak::get_taken("."));
 }
