@@ -1,4 +1,5 @@
 pub mod taak;
+pub mod sausid;
 
 #[cfg(test)]
 mod tests {
