@@ -1,12 +1,12 @@
+use super::{SaveToFile, project::*, sausid::*};
 use chrono::{DateTime, TimeDelta, prelude::*};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::{fs::File, io::BufReader, path::Path};
-use super::sausid::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Taak {
-        id: i64,
+    id: i64,
     pub start: DateTime<Utc>,
     pub deadline: DateTime<Utc>,
     pub beschrijving: String,
@@ -14,13 +14,6 @@ pub struct Taak {
     pub tijdschatting: TimeDelta,
 }
 impl SaveToFile for Taak {}
-
-pub trait SaveToFile: Serialize {
-    fn to_file(&self, path: &Path) {
-        let json = serde_json::to_string(&self).unwrap();
-        fs::write(path, json).unwrap();
-    }
-}
 
 impl Taak {
     pub fn new(
@@ -41,17 +34,20 @@ impl Taak {
         }
     }
 
-    pub fn get_taken(project: &str) -> Vec<Taak> {
+    pub fn get_taken(loc: &str) -> Vec<Taak> {
         let mut taken: Vec<Taak> = Vec::new();
-        if let Ok(entries) = fs::read_dir(project) {
+        // if let Ok(entries) = fs::read_dir(proj.get_id().to_string()) {
+        if let Ok(entries) = fs::read_dir(loc) {
             for entry in entries.flatten() {
                 // haal naam van files op
                 let os_filename = entry.file_name();
                 let filename: &str = os_filename.to_str().unwrap();
                 let file_len = filename.len();
-                if file_len <= 9 {continue;}
+                if file_len <= 9 {
+                    continue;
+                }
                 // open en push taak
-                if &filename[..4] == ("taak") && &filename[file_len - 5 ..] == ".json"{
+                if &filename[..4] == ("taak") && &filename[file_len - 5..] == ".json" {
                     let file = File::open(filename).unwrap();
                     let reader = BufReader::new(file);
                     let deserd_taak: Taak = serde_json::from_reader(reader).unwrap();
@@ -63,5 +59,11 @@ impl Taak {
     }
     pub fn get_id(&self) -> i64 {
         self.id
+    }
+
+    pub fn to_taak_file(self) -> Result<(), serde_json::Error> {
+        let filepath = &(format!("taak_{}.json", self.get_id()));
+        let path = Path::new(filepath);
+        self.to_file(path)
     }
 }
