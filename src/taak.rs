@@ -2,7 +2,7 @@ use super::{SaveToFile, project::*, sausid::*};
 use chrono::{DateTime, TimeDelta, prelude::*};
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::{fs::File, io::BufReader, path::Path};
+use std::{fs::File, io::BufReader, path::Path, path::PathBuf};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Taak {
@@ -62,8 +62,16 @@ impl Taak {
     }
 
     pub fn to_taak_file(self) -> Result<(), serde_json::Error> {
-        let filepath = &(format!("taak_{}.json", self.get_id()));
-        let path = Path::new(filepath);
+        let path = &self.taak_path();
         self.to_file(path)
+    }
+    pub fn remove(self){
+        let path = &self.taak_path();
+        fs::remove_file(path);
+    }
+
+    fn taak_path(&self) -> PathBuf {
+        let filepath = &(format!("taak_{}.json", self.get_id()));
+        Path::new(filepath).to_owned()
     }
 }

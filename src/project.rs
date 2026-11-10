@@ -66,4 +66,9 @@ impl Project {
         }
         projecten
     }
+
+    pub fn remove(self){
+        let project_naam= format!("project_{}", self.get_id());
+        fs::remove_dir_all(project_naam);
+    }
 }

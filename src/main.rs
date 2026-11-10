@@ -33,6 +33,9 @@ fn main() {
     println!("Projecten:\n{:?}\n", projecten);
     
     for proj in projecten{
-        proj.to_project_file().unwrap();
+        proj.remove();
+    }
+    for taak in taken {
+        taak.remove();
     }
 }
