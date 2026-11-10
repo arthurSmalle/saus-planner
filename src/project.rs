@@ -35,9 +35,9 @@ impl Project {
         }
     }
     pub fn to_project_file(self) -> Result<(), serde_json::Error> {
-        let project_naam= format!("project_{}", self.get_id());
+        let project_naam = format!("project_{}", self.get_id());
         create_dir_all(&project_naam).expect("fout bij maken van dir");
-        let path = Path::new(&project_naam).join(format!("{}.json",project_naam));
+        let path = Path::new(&project_naam).join(format!("{}.json", project_naam));
         self.to_file(path.as_path())
     }
     pub fn get_id(&self) -> i64 {
@@ -55,7 +55,7 @@ impl Project {
                     let os_filename = entry.file_name();
                     let filename: &str = os_filename.to_str().unwrap();
                     // open en push taak
-                    if filename.len() > 7 && &filename[..7] == ("project"){
+                    if filename.len() > 7 && &filename[..7] == ("project") {
                         let file = File::open(format!("{}/{}.json", filename, filename)).unwrap();
                         let reader = BufReader::new(file);
                         let deserd_project: Project = serde_json::from_reader(reader).unwrap();
@@ -67,8 +67,8 @@ impl Project {
         projecten
     }
 
-    pub fn remove(self){
-        let project_naam= format!("project_{}", self.get_id());
+    pub fn remove(self) {
+        let project_naam = format!("project_{}", self.get_id());
         fs::remove_dir_all(project_naam);
     }
 }

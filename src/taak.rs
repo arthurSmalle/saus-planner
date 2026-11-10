@@ -65,7 +65,7 @@ impl Taak {
         let path = &self.taak_path();
         self.to_file(path)
     }
-    pub fn remove(self){
+    pub fn remove(self) {
         let path = &self.taak_path();
         fs::remove_file(path);
     }
