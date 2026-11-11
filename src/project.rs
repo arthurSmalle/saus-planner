@@ -13,6 +13,8 @@ pub struct Project {
     pub deadline: DateTime<Utc>,
     pub naam: String,
     pub beschrijving: String,
+    #[serde(skip_serializing, skip_deserializing)]
+    pub taken: Vec<Taak>,
 }
 
 impl SaveToFile for Project {}
@@ -32,6 +34,7 @@ impl Project {
             deadline,
             naam,
             beschrijving,
+            taken: Vec::new(),
         }
     }
     /// schrijf het projct weg naar een file, er zal ook een dir worden gemaakt met de projectnaam
