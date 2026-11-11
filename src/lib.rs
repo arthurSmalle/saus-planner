@@ -1,8 +1,9 @@
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::Serialize;
 use std::fs;
 use std::path::Path;
 
 pub mod project;
+pub mod project_met_taken;
 pub mod sausid;
 pub mod taak;
 
@@ -14,16 +15,9 @@ pub trait SaveToFile: Serialize {
     }
 }
 
-pub trait GetList<T> {
-    fn parse_all_files(loc: &str) -> Vec<T> {
-        let mut lijst: Vec<T> = Vec::new();
-        lijst
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{project::*, sausid::*, taak::*};
+    use super::{project::*, sausid::*};
     use ::chrono::Days;
     #[test]
     fn test_id_collision() {
@@ -36,7 +30,7 @@ mod tests {
     fn test_create_and_remove_project() {
         // verwijder alle mogelijke projecten
         let projecten = Project::get_projects(".");
-        projecten.into_iter().for_each(|i| i.remove());
+        projecten.into_iter().for_each(|i| i.remove().unwrap());
 
         // basis die nodig is
         let mut id_gen = SausidGen::new();
@@ -63,6 +57,6 @@ mod tests {
             assert_eq!(project.beschrijving, "een project vol saus");
         }
         // verwijder test projecten
-        projecten.into_iter().for_each(|i| i.remove());
+        projecten.into_iter().for_each(|i| i.remove().unwrap());
     }
 }

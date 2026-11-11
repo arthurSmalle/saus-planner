@@ -1,13 +1,12 @@
-use super::SaveToFile;
-use super::{sausid::*, taak::*};
+use super::{self::*, sausid::*, taak::*};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::fmt::format;
-use std::fs::{self, DirBuilder, File, create_dir_all};
+use std::fs::{self, File, create_dir_all};
 use std::io::BufReader;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize, Deserialize)]
+/// struct die project omvat
 pub struct Project {
     id: i64,
     pub start: DateTime<Utc>,
@@ -19,6 +18,7 @@ pub struct Project {
 impl SaveToFile for Project {}
 
 impl Project {
+    /// new project aanmaken
     pub fn new(
         id_gen: &mut SausidGen,
         start: DateTime<Utc>,
@@ -34,16 +34,19 @@ impl Project {
             beschrijving,
         }
     }
+    /// schrijf het projct weg naar een file, er zal ook een dir worden gemaakt met de projectnaam
     pub fn to_project_file(self) -> Result<(), serde_json::Error> {
         let project_naam = format!("project_{}", self.get_id());
         create_dir_all(&project_naam).expect("fout bij maken van dir");
         let path = Path::new(&project_naam).join(format!("{}.json", project_naam));
         self.to_file(path.as_path())
     }
+    /// haal de interne id van de taak
     pub fn get_id(&self) -> i64 {
         self.id
     }
 
+    /// haal alle projecten in een locatie op
     pub fn get_projects(loc: &str) -> Vec<Project> {
         let mut projecten: Vec<Project> = vec![];
         if let Ok(entries) = fs::read_dir(loc) {
@@ -67,8 +70,13 @@ impl Project {
         projecten
     }
 
-    pub fn remove(self) {
-        let project_naam = format!("project_{}", self.get_id());
-        fs::remove_dir_all(project_naam);
+    /// verwijder een project (en alle bijhorende  bestanden
+    pub fn remove(self) -> Result<(), std::io::Error> {
+        fs::remove_dir_all(self.get_project_path())
+    }
+
+    pub fn get_project_path(&self) -> PathBuf {
+        let filepath = &(format!("project_{}", self.get_id()));
+        Path::new(filepath).to_owned()
     }
 }

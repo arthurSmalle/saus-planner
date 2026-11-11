@@ -1,6 +1,6 @@
-// saus versie van een uuid
-// tijdelijke implementatie (hopelijk geen 2 command die snel genoeg zijn zodat ze zelfde id
-// krijgen...)
+/// saus versie van een uuid
+/// tijdelijke implementatie (hopelijk geen 2 command die snel genoeg zijn zodat ze zelfde id
+/// krijgen...)
 use chrono::prelude::*;
 
 pub struct SausidGen {
