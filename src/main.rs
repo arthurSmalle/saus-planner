@@ -32,5 +32,7 @@ fn main() {
     let test_project_taken = ProjectMetTaken::new(test_project, taken);
     test_project_taken.to_file().unwrap();
     let projecten = Project::get_projects(".");
+    let taken = Taak::get_taken(projecten.first().unwrap());
+    taken.iter().for_each(|i| println!("\n{}\n",i.pretty_string()))
     // projecten.into_iter().for_each(|i| i.remove().unwrap());
 }

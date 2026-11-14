@@ -1,3 +1,5 @@
+use crate::project::{self, Project};
+
 use super::{SaveToFile, sausid::*};
 use chrono::{DateTime, TimeDelta, prelude::*};
 use serde::{Deserialize, Serialize};
@@ -16,6 +18,11 @@ pub struct Taak {
 impl SaveToFile for Taak {}
 
 impl Taak {
+
+    pub fn pretty_string(&self) -> String {
+        format!("id: {}\nstart: {}\ndeadline: {}\nbeschrijving: {}", self.id, self.start, self.deadline, self.beschrijving)
+    }
+
     pub fn new(
         id_gen: &mut SausidGen,
         start: DateTime<Utc>,
@@ -34,21 +41,24 @@ impl Taak {
         }
     }
 
-    pub fn get_taken(loc: &str) -> Vec<Taak> {
+    pub fn get_taken(project: &Project) -> Vec<Taak> {
         let mut taken: Vec<Taak> = Vec::new();
+        let project_path = project.get_project_path();
         // if let Ok(entries) = fs::read_dir(proj.get_id().to_string()) {
-        if let Ok(entries) = fs::read_dir(loc) {
+        if let Ok(entries) = fs::read_dir(&project_path) {
             for entry in entries.flatten() {
                 // haal naam van files op
                 let os_filename = entry.file_name();
                 let filename: &str = os_filename.to_str().unwrap();
+                println!("{filename}");
                 let file_len = filename.len();
                 if file_len <= 9 {
                     continue;
                 }
                 // open en push taak
                 if &filename[..4] == ("taak") && &filename[file_len - 5..] == ".json" {
-                    let file = File::open(filename).unwrap();
+                    let task_path = project_path.join(Path::new(filename));
+                    let file = File::open(task_path).unwrap();
                     let reader = BufReader::new(file);
                     let deserd_taak: Taak = serde_json::from_reader(reader).unwrap();
                     taken.push(deserd_taak);
