@@ -5,7 +5,7 @@ use std::fs::{self, File, create_dir_all};
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 /// struct die project omvat
 pub struct Project {
     id: i64,
@@ -14,7 +14,7 @@ pub struct Project {
     pub naam: String,
     pub beschrijving: String,
     #[serde(skip_serializing, skip_deserializing)]
-    pub taken: Vec<Taak>,
+    taken: Vec<Taak>,
 }
 
 impl SaveToFile for Project {}
@@ -42,6 +42,8 @@ impl Project {
         let project_naam = format!("project_{}", self.get_id());
         create_dir_all(&project_naam).expect("fout bij maken van dir");
         let path = Path::new(&project_naam).join(format!("{}.json", project_naam));
+        // schrijf alle taken ook weg
+        self.taken.clone().into_iter().try_for_each(|i| i.to_taak_file(Some(&self.get_project_path())))?;
         self.to_file(path.as_path())
     }
     /// haal de interne id van de taak
@@ -76,6 +78,16 @@ impl Project {
     /// verwijder een project (en alle bijhorende  bestanden
     pub fn remove(self) -> Result<(), std::io::Error> {
         fs::remove_dir_all(self.get_project_path())
+    }
+
+    pub fn fetch_taken(&mut self){
+        self.taken = Taak::get_taken(&self.get_project_path());
+    }
+    pub fn get_taken(&self) -> &Vec<Taak>{
+        &self.taken
+    }
+    pub fn add_taken(&mut self, taken_to_add: Vec<Taak>){
+        self.taken.extend(taken_to_add);
     }
 
     pub fn get_project_path(&self) -> PathBuf {

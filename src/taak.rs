@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::{fs::File, io::BufReader, path::Path, path::PathBuf};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Taak {
     id: i64,
     pub start: DateTime<Utc>,
@@ -41,11 +41,10 @@ impl Taak {
         }
     }
 
-    pub fn get_taken(project: &Project) -> Vec<Taak> {
+    pub fn get_taken(loc: &PathBuf) -> Vec<Taak> {
         let mut taken: Vec<Taak> = Vec::new();
-        let project_path = project.get_project_path();
         // if let Ok(entries) = fs::read_dir(proj.get_id().to_string()) {
-        if let Ok(entries) = fs::read_dir(&project_path) {
+        if let Ok(entries) = fs::read_dir(loc) {
             for entry in entries.flatten() {
                 // haal naam van files op
                 let os_filename = entry.file_name();
@@ -57,7 +56,7 @@ impl Taak {
                 }
                 // open en push taak
                 if &filename[..4] == ("taak") && &filename[file_len - 5..] == ".json" {
-                    let task_path = project_path.join(Path::new(filename));
+                    let task_path = loc.join(Path::new(filename));
                     let file = File::open(task_path).unwrap();
                     let reader = BufReader::new(file);
                     let deserd_taak: Taak = serde_json::from_reader(reader).unwrap();
@@ -71,15 +70,17 @@ impl Taak {
         self.id
     }
 
-    pub fn to_taak_file(self) -> Result<(), serde_json::Error> {
-        let path = &self.get_taak_path();
-        self.to_file(path)
+    pub fn to_taak_file(self, loc: Option<&PathBuf>) -> Result<(), serde_json::Error> {
+        let path = match loc {
+            Some(path) => path.join(self.get_taak_path()),
+            None => self.get_taak_path()
+        };
+        self.to_file(&path)
     }
     pub fn remove(self) {
         let path = &self.get_taak_path();
         fs::remove_file(path);
     }
-
     pub fn get_taak_path(&self) -> PathBuf {
         let filepath = &(format!("taak_{}.json", self.get_id()));
         Path::new(filepath).to_owned()

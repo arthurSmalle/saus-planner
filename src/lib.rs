@@ -3,7 +3,6 @@ use std::fs;
 use std::path::Path;
 
 pub mod project;
-pub mod project_met_taken;
 pub mod sausid;
 pub mod taak;
 
