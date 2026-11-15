@@ -1,0 +1,9 @@
+[package]
+name = "saus_planner_cli"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+chrono.workspace = true
+saus_planner_core = { version = "0.1.0", path = "../saus_planner_core" }
+

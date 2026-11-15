@@ -1,4 +1,4 @@
-use saus_planner::{project::*,sausid::*, taak::*};
+use saus_planner_core::{project::*,sausid::*, taak::*};
 use chrono::Days;
 
 fn main() {

@@ -1,0 +1,11 @@
+[package]
+name = "saus_planner_core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+chrono.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
